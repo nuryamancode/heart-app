@@ -128,7 +128,8 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => 'Login berhasil',
-                'token' => $token
+                'token' => $token,
+                'data' => $user->toArray(),
             ], 200);
         }
 
@@ -137,6 +138,40 @@ class AuthController extends Controller
         ], 401);
     }
 
+    public function register_api(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
+        ], [
+            'name.required' => 'Nama wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Email harus memiliki format yang benar.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
+        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'nik' => $request->nik,
+                'no_hp' => $request->no_hp,
+                'no_bpjs' => $request->no_bpjs,
+                'password' => Hash::make($request->password),
+            ]);
 
+            return response()->json([
+                'message' => 'Registrasi berhasil',
+                'data' => $user->toArray(),
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Registrasi gagal',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
 
+    }
 }

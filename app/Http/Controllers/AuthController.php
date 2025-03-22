@@ -130,11 +130,13 @@ class AuthController extends Controller
                 'message' => 'Login berhasil',
                 'token' => $token,
                 'data' => $user->toArray(),
+                'status' => true
             ], 200);
         }
 
         return response()->json([
-            'message' => 'Email atau password salah.'
+            'message' => 'Email atau password salah.',
+            'status' => false
         ], 401);
     }
 
@@ -142,10 +144,14 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required',
+            'nik' => 'required',
+            'no_hp' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8',
         ], [
             'name.required' => 'Nama wajib diisi.',
+            'nik.required' => 'NIK wajib diisi.',
+            'no_hp.required' => 'No HP wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Email harus memiliki format yang benar.',
             'email.unique' => 'Email sudah terdaftar.',
@@ -153,6 +159,14 @@ class AuthController extends Controller
             'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
         ]);
         try {
+
+            if (User::where('email', $request->email)->exists()) {
+                return response()->json([
+                    'message' => 'Email sudah terdaftar.',
+                    'status' => false
+                ], 400);
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -165,11 +179,13 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Registrasi berhasil',
                 'data' => $user->toArray(),
+                'status'=> true
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Registrasi gagal',
                 'error' => $e->getMessage(),
+                'status' => false
             ], 500);
         }
 

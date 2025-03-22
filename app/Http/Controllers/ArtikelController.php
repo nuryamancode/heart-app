@@ -141,4 +141,31 @@ class ArtikelController extends Controller
         Alert::success('Success', 'Artikel berhasil dihapus');
         return redirect()->route('artikel');
     }
+
+    public function berita()
+    {
+        try {
+            $artikel = Artikel::orderBy('created_at', 'desc')->get();
+            return response()->json([
+                'data' => $artikel
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function berita_detail($id){
+        try {
+            $artikel = Artikel::where('id', $id)->first();
+            return response()->json([
+                'data' => $artikel
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
+        }
+    }
 }

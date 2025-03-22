@@ -164,4 +164,17 @@ class JadwalController extends Controller
         Alert::success('Success', 'Jadwal berhasil dihapus');
         return redirect()->route('jadwal-dokter');
     }
+
+    public function jadwal(){
+        try {
+            $jadwal = Jadwal::orderBy('created_at', 'desc')->get();
+            return response()->json([
+                'data'=> $jadwal
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
+        }
+    }
 }

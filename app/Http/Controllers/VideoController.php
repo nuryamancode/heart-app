@@ -109,4 +109,17 @@ class VideoController extends Controller
             return redirect()->back();
         }
     }
+
+    public function video_tutorial(){
+        try {
+            $video = Video::orderBy('id','desc')->first();
+            return response()->json([
+                'data'=> $video
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
+        }
+    }
 }

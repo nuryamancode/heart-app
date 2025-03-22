@@ -165,12 +165,16 @@ class AntrianController extends Controller
     // User FE
     public function antrian()
     {
-        $data = [
-            'antrian' => Antrian::all(),
-            'jadwal' => Jadwal::orderBy('created_at', 'desc')->get()
-
-        ];
-        return view('user.antrian', $data);
+        try {
+            $antrian = Antrian::orderBy('created_at', 'desc')->get();
+            return response()->json([
+                'data' => $antrian
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
+        }
     }
 }
 

@@ -1,35 +1,31 @@
 <?php
 
 use App\Http\Controllers\AntrianController;
+use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
 Route::post('/signin', [AuthController::class, 'login_api']);
 Route::post('/signup', [AuthController::class, 'register_api']);
+Route::get('/berita', [ArtikelController::class, 'berita']);
+Route::get('/detail-berita/{id}', [ArtikelController::class, 'berita_detail']);
+Route::get('/jadwal', [JadwalController::class, 'jadwal']);
+Route::get('/video-tutorial', [VideoController::class, 'video_tutorial']);
+Route::get('/antrian', [AntrianController::class, 'antrian']);
 
 
 
-
-
-Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
-
-Route::get('/detail-berita/{id}', [HomeController::class, 'detail'])->name('detail-berita');
 // Home Page & Berita & Detail Berita
 
-// Test Page & Test Result
-Route::get('/test-page', [TestController::class, 'index'])->name('test-page');
-
-// init id start soal
-Route::get('/start', [TestController::class, 'start'])->name('start');
 
 // Soal
 Route::get('/soal-1/{test}', [TestController::class, 'soal_1'])->name('soal-1');
@@ -50,7 +46,6 @@ Route::get('/soal-13/{test}', [TestController::class, 'soal_13'])->name('soal-13
 Route::get('/test-page-result/{test}', [TestController::class, 'result'])->name('test-page-result');
 
 // Antrian
-Route::get('/antrian', [AntrianController::class, 'antrian'])->name('antrian');
 // Antrian
 
 // Riwayat

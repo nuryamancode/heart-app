@@ -140,13 +140,13 @@ class AuthController extends Controller
                 'token' => $token,
                 'data' => $user->toArray(),
                 'status' => true
-            ], 200);
+            ]);
         }
 
         return response()->json([
             'message' => 'Email atau password salah.',
             'status' => false
-        ], 401);
+        ]);
     }
 
     public function register_api(Request $request)
@@ -177,14 +177,14 @@ class AuthController extends Controller
                 'message' => 'Data yang dimasukkan tidak valid.',
                 'errors' => $validator->errors(),
                 'status' => false
-            ], 422);
+            ]);
         }
 
         if (User::where('email', $request->email)->exists()) {
             return response()->json([
                 'message' => 'Email sudah terdaftar.',
                 'status' => false
-            ], 400);
+            ]);
         }
 
         $user = User::create([
@@ -200,13 +200,13 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Registrasi gagal',
                 'status' => false
-            ], 500);
+            ]);
         } else {
             return response()->json([
                 'message' => 'Registrasi berhasil',
                 'data' => $user->toArray(),
                 'status' => true
-            ], 201);
+            ]);
         }
 
 

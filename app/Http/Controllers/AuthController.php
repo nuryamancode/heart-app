@@ -142,7 +142,7 @@ class AuthController extends Controller
             $token = $user->createToken('API Token')->plainTextToken;
 
             return $this->callresponse->response(
-                null,
+                'Login berhasil',
                 [
                     'user' => $user->toArray(),
                     'token' => $token
@@ -168,6 +168,7 @@ class AuthController extends Controller
                 'no_hp' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:8',
+                'password_confirmation' => 'required|same:password',
             ],
             [
                 'name.required' => 'Nama wajib diisi.',
@@ -179,6 +180,8 @@ class AuthController extends Controller
                 'nik.unique' => 'NIK sudah terdaftar.',
                 'password.required' => 'Kata sandi wajib diisi.',
                 'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
+                'password_confirmation.required' => 'Konfirmasi kata sandi wajib diisi.',
+                'password_confirmation.same' => 'Konfirmasi kata sandi harus sama dengan kata sandi.',
             ]
         );
 
@@ -199,6 +202,7 @@ class AuthController extends Controller
             );
         }
 
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -216,7 +220,7 @@ class AuthController extends Controller
             );
         } else {
             return $this->callresponse->response(
-                null,
+                'Registrasi berhasil',
                 $user->toArray(),
                 true
             );

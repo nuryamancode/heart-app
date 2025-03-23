@@ -127,10 +127,11 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $errors = $validator->errors()->all();
             return $this->callresponse->response(
-                'Data tidak valid',
-                $validator->errors(),
-                false
+                $errors[0],
+                null,
+                false,
             );
         }
 
@@ -141,7 +142,7 @@ class AuthController extends Controller
             $token = $user->createToken('API Token')->plainTextToken;
 
             return $this->callresponse->response(
-                'Login berhasil',
+                null,
                 [
                     'user' => $user->toArray(),
                     'token' => $token
@@ -151,7 +152,7 @@ class AuthController extends Controller
         }
 
         return $this->callresponse->response(
-            'Email atau password salah',
+            'Email atau password salah.',
             null,
             false
         );
@@ -182,10 +183,11 @@ class AuthController extends Controller
         );
 
         if ($validator->fails()) {
+            $errors = $validator->errors()->all();
             return $this->callresponse->response(
-                'Data tidak valid',
-                $validator->errors(),
-                false
+                $errors[0],
+                null,
+                false,
             );
         }
 
@@ -214,7 +216,7 @@ class AuthController extends Controller
             );
         } else {
             return $this->callresponse->response(
-                'Registrasi berhasil',
+                null,
                 $user->toArray(),
                 true
             );

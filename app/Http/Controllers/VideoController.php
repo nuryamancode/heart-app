@@ -8,6 +8,11 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class VideoController extends Controller
 {
+    protected $callresponse;
+    public function __construct(ResponseController $response)
+    {
+        $this->callresponse = $response;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -110,16 +115,21 @@ class VideoController extends Controller
         }
     }
 
-    public function video_tutorial(){
+    public function video_tutorial()
+    {
         try {
-            $video = Video::orderBy('id','desc')->first();
-            return response()->json([
-                'data'=> $video
-            ]);
+            $video = Video::orderBy('id', 'desc')->first();
+            return $this->callresponse->response(
+                'Video berhasil diambil',
+                $video,
+                true
+            );
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ]);
+            return $this->callresponse->response(
+                'Video gagal diambil',
+                $th->getMessage(),
+                false
+            );
         }
     }
 }

@@ -8,6 +8,11 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class JadwalController extends Controller
 {
+    protected $callresponse;
+    public function __construct(ResponseController $respone)
+    {
+        $this->callresponse = $respone;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -165,16 +170,21 @@ class JadwalController extends Controller
         return redirect()->route('jadwal-dokter');
     }
 
-    public function jadwal(){
+    public function jadwal()
+    {
         try {
             $jadwal = Jadwal::orderBy('created_at', 'desc')->get();
-            return response()->json([
-                'data'=> $jadwal
-            ]);
+            return $this->callresponse->response(
+                'Jadwal berhasil diambil',
+                $jadwal,
+                true
+            );
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ]);
+            return $this->callresponse->response(
+                'Jadwal gagal diambil',
+                $th->getMessage(),
+                false
+            );
         }
     }
 }

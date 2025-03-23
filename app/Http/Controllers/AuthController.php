@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    protected $callresponse;
+    public function __construct(ResponseController $response)
+    {
+        $this->callresponse = $response;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -122,11 +127,11 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Data yang dimasukkan tidak valid.',
-                'errors' => $validator->errors(),
-                'status' => false
-            ]);
+            return $this->callresponse->response(
+                'Data tidak valid',
+                $validator->errors(),
+                false
+            );
         }
 
         $credentials = $request->only('email', 'password');
@@ -135,18 +140,21 @@ class AuthController extends Controller
             $user = auth()->user();
             $token = $user->createToken('API Token')->plainTextToken;
 
-            return response()->json([
-                'message' => 'Login berhasil',
-                'token' => $token,
-                'data' => $user->toArray(),
-                'status' => true
-            ]);
+            return $this->callresponse->response(
+                'Login berhasil',
+                [
+                    'user' => $user->toArray(),
+                    'token' => $token
+                ],
+                true
+            );
         }
 
-        return response()->json([
-            'message' => 'Email atau password salah.',
-            'status' => false
-        ]);
+        return $this->callresponse->response(
+            'Email atau password salah',
+            null,
+            false
+        );
     }
 
     public function register_api(Request $request)
@@ -155,7 +163,7 @@ class AuthController extends Controller
             $request->all(),
             [
                 'name' => 'required',
-                'nik' => 'required',
+                'nik' => 'required|unique:users',
                 'no_hp' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:8',
@@ -167,24 +175,26 @@ class AuthController extends Controller
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Email harus memiliki format yang benar.',
                 'email.unique' => 'Email sudah terdaftar.',
+                'nik.unique' => 'NIK sudah terdaftar.',
                 'password.required' => 'Kata sandi wajib diisi.',
                 'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
             ]
         );
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Data yang dimasukkan tidak valid.',
-                'errors' => $validator->errors(),
-                'status' => false
-            ]);
+            return $this->callresponse->response(
+                'Data tidak valid',
+                $validator->errors(),
+                false
+            );
         }
 
         if (User::where('email', $request->email)->exists()) {
-            return response()->json([
-                'message' => 'Email sudah terdaftar.',
-                'status' => false
-            ]);
+            return $this->callresponse->response(
+                'Email sudah terdaftar',
+                null,
+                false
+            );
         }
 
         $user = User::create([
@@ -197,16 +207,17 @@ class AuthController extends Controller
         ]);
 
         if (!$user) {
-            return response()->json([
-                'message' => 'Registrasi gagal',
-                'status' => false
-            ]);
+            return $this->callresponse->response(
+                'Registrasi gagal',
+                null,
+                false
+            );
         } else {
-            return response()->json([
-                'message' => 'Registrasi berhasil',
-                'data' => $user->toArray(),
-                'status' => true
-            ]);
+            return $this->callresponse->response(
+                'Registrasi berhasil',
+                $user->toArray(),
+                true
+            );
         }
 
 

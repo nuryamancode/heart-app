@@ -11,6 +11,13 @@ class ArtikelController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    protected $callresponse;
+    public function __construct(ResponseController $response)
+    {
+        $this->callresponse = $response;
+    }
+
     public function index()
     {
         $data = [
@@ -146,26 +153,35 @@ class ArtikelController extends Controller
     {
         try {
             $artikel = Artikel::orderBy('created_at', 'desc')->get();
-            return response()->json([
-                'data' => $artikel
-            ]);
+            return $this->callresponse->response(
+                'Berita berhasil diambil',
+                $artikel,
+                true
+            );
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ]);
+            return $this->callresponse->response(
+                'Berita gagal diambil',
+                $th->getMessage(),
+                false
+            );
         }
     }
 
-    public function berita_detail($id){
+    public function berita_detail($id)
+    {
         try {
             $artikel = Artikel::where('id', $id)->first();
-            return response()->json([
-                'data' => $artikel
-            ]);
+            return $this->callresponse->response(
+                'Berita berhasil diambil',
+                $artikel,
+                true
+            );
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ]);
+            return $this->callresponse->response(
+                'Berita gagal diambil',
+                $th->getMessage(),
+                false
+            );
         }
     }
 }

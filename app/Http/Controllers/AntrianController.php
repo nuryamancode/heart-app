@@ -9,6 +9,10 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class AntrianController extends Controller
 {
+    protected $callresponse;
+    public function __construct(ResponseController $respone){
+        $this->callresponse = $respone;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -167,13 +171,17 @@ class AntrianController extends Controller
     {
         try {
             $antrian = Antrian::orderBy('created_at', 'desc')->get();
-            return response()->json([
-                'data' => $antrian
-            ]);
+            return $this->callresponse->response(
+                'Antrian berhasil diambil',
+                $antrian,
+                true
+            );
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ]);
+            return $this->callresponse->response(
+                'Antrian gagal diambil',
+                $th->getMessage(),
+                false
+            );
         }
     }
 }

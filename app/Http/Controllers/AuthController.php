@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -110,7 +111,7 @@ class AuthController extends Controller
 
     public function login_api(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|min:8',
         ], [
@@ -119,6 +120,14 @@ class AuthController extends Controller
             'password.required' => 'Kata sandi wajib diisi.',
             'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Data yang dimasukkan tidak valid.',
+                'errors' => $validator->errors(),
+                'status' => false
+            ]);
+        }
 
         $credentials = $request->only('email', 'password');
 
@@ -142,52 +151,64 @@ class AuthController extends Controller
 
     public function register_api(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'nik' => 'required',
-            'no_hp' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
-        ], [
-            'name.required' => 'Nama wajib diisi.',
-            'nik.required' => 'NIK wajib diisi.',
-            'no_hp.required' => 'No HP wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Email harus memiliki format yang benar.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'password.required' => 'Kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name' => 'required',
+                'nik' => 'required',
+                'no_hp' => 'required',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:8',
+            ],
+            [
+                'name.required' => 'Nama wajib diisi.',
+                'nik.required' => 'NIK wajib diisi.',
+                'no_hp.required' => 'No HP wajib diisi.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Email harus memiliki format yang benar.',
+                'email.unique' => 'Email sudah terdaftar.',
+                'password.required' => 'Kata sandi wajib diisi.',
+                'password.min' => 'Kata sandi harus memiliki minimal :min karakter.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Data yang dimasukkan tidak valid.',
+                'errors' => $validator->errors(),
+                'status' => false
+            ], 422);
+        }
+
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'message' => 'Email sudah terdaftar.',
+                'status' => false
+            ], 400);
+        }
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'nik' => $request->nik,
+            'no_hp' => $request->no_hp,
+            'no_bpjs' => $request->no_bpjs,
+            'password' => Hash::make($request->password),
         ]);
-        try {
 
-            if (User::where('email', $request->email)->exists()) {
-                return response()->json([
-                    'message' => 'Email sudah terdaftar.',
-                    'status' => false
-                ], 400);
-            }
-
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'nik' => $request->nik,
-                'no_hp' => $request->no_hp,
-                'no_bpjs' => $request->no_bpjs,
-                'password' => Hash::make($request->password),
-            ]);
-
+        if (!$user) {
+            return response()->json([
+                'message' => 'Registrasi gagal',
+                'status' => false
+            ], 500);
+        } else {
             return response()->json([
                 'message' => 'Registrasi berhasil',
                 'data' => $user->toArray(),
-                'status'=> true
+                'status' => true
             ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Registrasi gagal',
-                'error' => $e->getMessage(),
-                'status' => false
-            ], 500);
         }
+
 
     }
 }

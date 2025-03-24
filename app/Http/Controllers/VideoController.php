@@ -119,6 +119,18 @@ class VideoController extends Controller
     {
         try {
             $video = Video::orderBy('id', 'desc')->first();
+
+            if (!$video) {
+                return $this->callresponse->response(
+                    'Video tidak ditemukan',
+                    null,
+                    false
+                );
+            }
+
+            // Pastikan URL bersifat full URL
+            $video->video = asset('video/' . $video->video);
+
             return $this->callresponse->response(
                 'Video berhasil diambil',
                 $video,
@@ -126,8 +138,8 @@ class VideoController extends Controller
             );
         } catch (\Throwable $th) {
             return $this->callresponse->response(
-                'Video gagal diambil',
                 $th->getMessage(),
+                null,
                 false
             );
         }

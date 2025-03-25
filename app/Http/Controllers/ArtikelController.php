@@ -159,7 +159,7 @@ class ArtikelController extends Controller
                     null,
                     false
                 );
-            }else{
+            } else {
                 foreach ($artikel as $item) {
                     $item->foto = asset('images/artikel/' . $item->foto);
                 }
@@ -188,13 +188,14 @@ class ArtikelController extends Controller
                     null,
                     false
                 );
+            } else {
+                $artikel->foto = asset('images/artikel/' . $artikel->foto);
+                return $this->callresponse->response(
+                    'Berita berhasil diambil',
+                    $artikel,
+                    true
+                );
             }
-            $artikel->foto = asset('images/artikel/' . $artikel->foto);
-            return $this->callresponse->response(
-                'Berita berhasil diambil',
-                $artikel,
-                true
-            );
         } catch (\Throwable $th) {
             return $this->callresponse->response(
                 $th->getMessage(),

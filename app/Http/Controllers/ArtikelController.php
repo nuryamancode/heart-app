@@ -153,15 +153,26 @@ class ArtikelController extends Controller
     {
         try {
             $artikel = Artikel::orderBy('created_at', 'desc')->get();
-            return $this->callresponse->response(
-                'Berita berhasil diambil',
-                $artikel,
-                true
-            );
+            if ($artikel->isEmpty()) {
+                return $this->callresponse->response(
+                    'Berita tidak ditemukan',
+                    null,
+                    false
+                );
+            }else{
+                foreach ($artikel as $item) {
+                    $item->foto = asset('images/artikel/' . $item->foto);
+                }
+                return $this->callresponse->response(
+                    'Berita berhasil diambil',
+                    $artikel,
+                    true
+                );
+            }
         } catch (\Throwable $th) {
             return $this->callresponse->response(
-                'Berita gagal diambil',
                 $th->getMessage(),
+                null,
                 false
             );
         }
@@ -171,6 +182,14 @@ class ArtikelController extends Controller
     {
         try {
             $artikel = Artikel::where('id', $id)->first();
+            if (!$artikel) {
+                return $this->callresponse->response(
+                    'Berita tidak ditemukan',
+                    null,
+                    false
+                );
+            }
+            $artikel->foto = asset('images/artikel/' . $artikel->foto);
             return $this->callresponse->response(
                 'Berita berhasil diambil',
                 $artikel,
@@ -178,8 +197,8 @@ class ArtikelController extends Controller
             );
         } catch (\Throwable $th) {
             return $this->callresponse->response(
-                'Berita gagal diambil',
                 $th->getMessage(),
+                null,
                 false
             );
         }

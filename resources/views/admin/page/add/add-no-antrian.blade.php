@@ -24,15 +24,6 @@
                             </span>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label for="fotoAntrian" class="form-label">Foto</label>
-                        <input type="file" class="form-control border-secondary" id="fotoAntrian" name="foto">
-                        @error('foto')
-                            <span class="text-danger">
-                                {{ $message }}
-                            </span>
-                        @enderror
-                    </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>

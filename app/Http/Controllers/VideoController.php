@@ -127,10 +127,7 @@ class VideoController extends Controller
                     false
                 );
             }
-
-            // Pastikan URL bersifat full URL
             $video->video = asset('video/' . $video->video);
-
             return $this->callresponse->response(
                 'Video berhasil diambil',
                 $video,

@@ -10,7 +10,8 @@ use RealRashid\SweetAlert\Facades\Alert;
 class AntrianController extends Controller
 {
     protected $callresponse;
-    public function __construct(ResponseController $respone){
+    public function __construct(ResponseController $respone)
+    {
         $this->callresponse = $respone;
     }
     /**
@@ -52,31 +53,17 @@ class AntrianController extends Controller
                 'max:100',
                 'unique:antrians,no_antrian',
             ],
-            'foto' => [
-                'required',
-                'image',
-                'mimes:jpeg,jpg,png',
-                'max:2048',
-            ],
         ], [
             'no_antrian.required' => 'Nomor antrian wajib diisi.',
             'no_antrian.integer' => 'Nomor antrian harus berupa angka.',
             'no_antrian.min' => 'Nomor antrian tidak boleh kurang dari 1.',
             'no_antrian.max' => 'Nomor antrian tidak boleh lebih dari 100.',
             'no_antrian.unique' => 'Nomor antrian ini sudah ada, silakan gunakan nomor lain.',
-            'foto.required' => 'Foto wajib diunggah.',
-            'foto.image' => 'File yang diunggah harus berupa gambar.',
-            'foto.mimes' => 'Foto harus berformat jpeg, jpg, atau png.',
-            'foto.max' => 'Ukuran foto tidak boleh lebih dari 2MB.',
         ]);
 
 
-        $foto = $request->file('foto');
-        $filename = time() . '_' . $foto->getClientOriginalName();
-        $foto->move(public_path('images/number'), $filename);
         Antrian::create([
             'no_antrian' => $request->no_antrian,
-            'foto' => $filename
         ]);
 
         Alert::success('Success', 'Antrian berhasil ditambahkan');
@@ -118,31 +105,13 @@ class AntrianController extends Controller
                 'max:100',
                 'unique:antrians,no_antrian,' . $antrianId->id,
             ],
-            'foto' => [
-                'image',
-                'mimes:jpeg,jpg,png',
-                'max:2048',
-            ],
         ], [
             'no_antrian.integer' => 'Nomor antrian harus berupa angka.',
             'no_antrian.min' => 'Nomor antrian tidak boleh kurang dari 1.',
             'no_antrian.max' => 'Nomor antrian tidak boleh lebih dari 100.',
             'no_antrian.unique' => 'Nomor antrian ini sudah ada, silakan gunakan nomor lain.',
-            'foto.required' => 'Foto wajib diunggah.',
-            'foto.image' => 'File yang diunggah harus berupa gambar.',
-            'foto.mimes' => 'Foto harus berformat jpeg, jpg, atau png.',
-            'foto.max' => 'Ukuran foto tidak boleh lebih dari 2MB.',
         ]);
 
-        if ($request->hasFile('foto')) {
-            if ($antrianId->foto && file_exists(public_path('images/number/' . $antrianId->foto))) {
-                unlink(public_path('images/number/' . $antrianId->foto));
-            }
-            $foto = $request->file('foto');
-            $filename = time() . '_' . $foto->getClientOriginalName();
-            $foto->move(public_path('images/number'), $filename);
-            $antrianId->foto = $filename;
-        }
         $antrianId->no_antrian = $request->no_antrian;
         $antrianId->save();
         Alert::success('Success', 'Antrian berhasil diupdate');
@@ -156,9 +125,6 @@ class AntrianController extends Controller
     {
         $antrianId = Antrian::where('id', $id)->first();
         if ($antrianId) {
-            if ($antrianId->foto && file_exists(public_path('images/number/' . $antrianId->foto))) {
-                unlink(public_path('images/number/' . $antrianId->foto));
-            }
             $antrianId->delete();
             Alert::success('Success', 'Antrian berhasil dihapus');
             return redirect()->back();
@@ -171,6 +137,13 @@ class AntrianController extends Controller
     {
         try {
             $antrian = Antrian::orderBy('created_at', 'desc')->get();
+            if ($antrian->isEmpty()) {
+                return $this->callresponse->response(
+                    'Antrian tidak ditemukan',
+                    null,
+                    false
+                );
+            }
             return $this->callresponse->response(
                 'Antrian berhasil diambil',
                 $antrian,
@@ -178,8 +151,8 @@ class AntrianController extends Controller
             );
         } catch (\Throwable $th) {
             return $this->callresponse->response(
-                'Antrian gagal diambil',
                 $th->getMessage(),
+                null,
                 false
             );
         }

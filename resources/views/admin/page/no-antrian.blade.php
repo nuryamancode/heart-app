@@ -13,7 +13,6 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">Nomor Antrian</th>
-                                    <th class="text-center">Foto</th>
                                     <th class="text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -21,10 +20,6 @@
                                 @foreach ($antrian as $item)
                                     <tr>
                                         <td class="text-center">{{ $item->no_antrian }}</td>
-                                        <td class="text-center">
-                                            <img src="{{ asset('images/number/' . $item->foto) }}" alt="Foto"
-                                                style="width: 50px; height: 50px;">
-                                        </td>
                                         <td class="text-center">
                                             <a href="{{ route('edit-no-antrian', $item->id) }}"
                                                 class="btn btn-primary me-3"><i class="link-icon"

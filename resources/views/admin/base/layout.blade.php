@@ -18,7 +18,8 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/vendors/datatables.net-bs5/dataTables.bootstrap5.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/fonts/feather-font/css/iconfont.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
-    <link rel="shortcut icon" href="{{ asset('assets/admin/images/favicon.png') }}" />
+    <link rel="icon" href="{{ asset('assets/image-new/logo-heart.png') }}">
+
 </head>
 
 <body style="background-color: #f7f5f5">

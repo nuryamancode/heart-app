@@ -174,15 +174,26 @@ class JadwalController extends Controller
     {
         try {
             $jadwal = Jadwal::orderBy('created_at', 'desc')->get();
-            return $this->callresponse->response(
-                'Jadwal berhasil diambil',
-                $jadwal,
-                true
-            );
+            if ($jadwal->isEmpty()) {
+                return $this->callresponse->response(
+                    'Jadwal tidak ditemukan',
+                    null,
+                    false
+                );
+            }else{
+                foreach ($jadwal as $item) {
+                    $item->foto = asset('images/dokter/' . $item->foto);
+                }
+                return $this->callresponse->response(
+                    'Jadwal berhasil diambil',
+                    $jadwal,
+                    true
+                );
+            }
         } catch (\Throwable $th) {
             return $this->callresponse->response(
-                'Jadwal gagal diambil',
                 $th->getMessage(),
+                null,
                 false
             );
         }

@@ -8,7 +8,7 @@
         <div class="container">
             <div class="sign-in-screen_full">
                 <div class="sign-in-screen-top">
-                    <h1 class="text-center">Panel Administrator</h1>
+                    <h1 class="text-center">Panel Administrator Test</h1>
                     <form class="sign-in-form mt-16" action="/login" method="post" novalidate>
                         @csrf
                         <div class="form-sec">

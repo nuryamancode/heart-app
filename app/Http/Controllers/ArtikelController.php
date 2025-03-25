@@ -182,20 +182,23 @@ class ArtikelController extends Controller
     {
         try {
             $artikel = Artikel::where('id', $id)->first();
+
+            // Pastikan artikel ditemukan
             if (!$artikel) {
                 return $this->callresponse->response(
                     'Berita tidak ditemukan',
                     null,
                     false
                 );
-            } else {
-                $artikel->foto = asset('images/artikel/' . $artikel->foto);
-                return $this->callresponse->response(
-                    'Berita berhasil diambil',
-                    $artikel,
-                    true
-                );
             }
+
+            // Jika artikel ditemukan
+            $artikel->foto = asset('images/artikel/' . $artikel->foto);
+            return $this->callresponse->response(
+                'Berita berhasil diambil',
+                $artikel,
+                true
+            );
         } catch (\Throwable $th) {
             return $this->callresponse->response(
                 $th->getMessage(),
@@ -204,4 +207,5 @@ class ArtikelController extends Controller
             );
         }
     }
+
 }

@@ -126,13 +126,14 @@ class VideoController extends Controller
                     null,
                     false
                 );
+            }else{
+                $video->video = asset('video/' . $video->video);
+                return $this->callresponse->response(
+                    'Video berhasil diambil',
+                    $video,
+                    true
+                );
             }
-            $video->video = asset('video/' . $video->video);
-            return $this->callresponse->response(
-                'Video berhasil diambil',
-                $video,
-                true
-            );
         } catch (\Throwable $th) {
             return $this->callresponse->response(
                 $th->getMessage(),

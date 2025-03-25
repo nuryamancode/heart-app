@@ -23,6 +23,7 @@ class User extends Authenticatable
         'nik',
         'role',
         'no_hp',
+        'foto',
         'no_bpjs',
         'password',
     ];

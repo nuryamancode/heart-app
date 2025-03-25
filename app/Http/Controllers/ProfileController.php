@@ -7,10 +7,16 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ProfileController extends Controller
 {
+    protected $callresponse;
+    public function __construct(ResponseController $response)
+    {
+        $this->callresponse = $response;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -18,7 +24,7 @@ class ProfileController extends Controller
     {
         //
         return view('user.profile', [
-            'user'  => User::find(Auth::user()->id),
+            'user' => User::find(Auth::user()->id),
         ]);
     }
 
@@ -40,7 +46,7 @@ class ProfileController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'no_hp' => $request->no_hp,
-            'nik'   => $request->nik,
+            'nik' => $request->nik,
             'no_bpjs' => $request->no_bpjs
         ]);
 
@@ -106,5 +112,63 @@ class ProfileController extends Controller
         ]);
         Alert::success('Success', 'Password Berhasil Diubah');
         return redirect()->back();
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        \Log::info($id); 
+        $user = User::find($id);
+        // dd($user);
+        if (!$user) {
+            return $this->callresponse->response(
+                'User tidak ditemukan',
+                null,
+                false,
+            );
+        }
+        \Log::info($request->all()); 
+
+        $validator = Validator::make($request->all(), [
+            'email' => 'email',
+            'name' => 'required|string',
+            // 'foto' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+        ], [
+            'email.email' => 'Email harus memiliki format yang benar.',
+            // 'foto.image' => 'File harus berupa gambar.',
+            // 'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau svg.',
+            // 'foto.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return $this->callresponse->response(
+                $errors[0],
+                null,
+                false,
+            );
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->nik = $request->nik;
+        $user->no_hp = $request->no_hp;
+        $user->no_bpjs = $request->no_bpjs;
+
+        // Handle image upload
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $name = time() . '.' . $foto->getClientOriginalExtension();
+            $nameFile = $foto->move(public_path('images/profile'), $name);
+            $user->foto = $nameFile;
+            $user->foto = asset('images/profile/' . $name);
+        }
+
+        $user->save();
+        return $this->callresponse->response(
+            'Foto berhasil diubah',
+            $user,
+            true,
+        );
+
     }
 }

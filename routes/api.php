@@ -22,6 +22,7 @@ Route::get('/jadwal', [JadwalController::class, 'jadwal']);
 Route::get('/video-tutorial', [VideoController::class, 'video_tutorial']);
 Route::get('/antrian', [AntrianController::class, 'antrian']);
 
+Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile']);
 
 
 // Home Page & Berita & Detail Berita

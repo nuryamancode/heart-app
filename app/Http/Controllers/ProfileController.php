@@ -116,7 +116,7 @@ class ProfileController extends Controller
 
     public function updateProfile(Request $request, $id)
     {
-        \Log::info($id); 
+        \Log::info($id);
         $user = User::find($id);
         // dd($user);
         if (!$user) {
@@ -126,17 +126,17 @@ class ProfileController extends Controller
                 false,
             );
         }
-        \Log::info($request->all()); 
+        \Log::info($request->all());
 
         $validator = Validator::make($request->all(), [
             'email' => 'email',
             'name' => 'required|string',
-            // 'foto' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
+            'foto' => 'image|mimes:jpeg,png,jpg,svg|max:2048',
         ], [
             'email.email' => 'Email harus memiliki format yang benar.',
-            // 'foto.image' => 'File harus berupa gambar.',
-            // 'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau svg.',
-            // 'foto.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau svg.',
+            'foto.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -169,6 +169,58 @@ class ProfileController extends Controller
             $user,
             true,
         );
+    }
 
+    public function updatePasswordApi(Request $request, $id)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ], [
+            'current_password.required' => 'Password lama wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru harus memiliki minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return $this->callresponse->response(
+                $errors[0],
+                null,
+                false,
+            );
+        }
+
+        // Find the user by the provided ID
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found.',
+                'success' => false,
+            ], 404);
+        }
+
+        // Check if the current password matches the one in the database
+        if (!Hash::check($request->current_password, $user->password)) {
+            return $this->callresponse->response(
+                'Password lama salah.',
+                null,
+                false
+            );
+        }
+
+        // Update the password
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return $this->callresponse->response(
+            'Password berhasil diubah.',
+            null,
+            true
+        );
     }
 }

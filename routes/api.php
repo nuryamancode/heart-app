@@ -23,6 +23,7 @@ Route::get('/video-tutorial', [VideoController::class, 'video_tutorial']);
 Route::get('/antrian', [AntrianController::class, 'antrian']);
 
 Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile']);
+Route::post('/update-password/{id}', [ProfileController::class, 'updatePasswordApi']);
 
 
 // Home Page & Berita & Detail Berita

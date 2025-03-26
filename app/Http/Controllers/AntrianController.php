@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Antrian;
 use App\Models\Jadwal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AntrianController extends Controller
@@ -136,7 +138,7 @@ class AntrianController extends Controller
     public function antrian()
     {
         try {
-            $antrian = Antrian::orderBy('created_at', 'desc')->get();
+            $antrian = Antrian::orderBy('created_at', 'desc')->whereNull('user_id')->whereDate('created_at', Carbon::today())->get();
             if ($antrian->isEmpty()) {
                 return $this->callresponse->response(
                     'Antrian tidak ditemukan',
@@ -157,5 +159,85 @@ class AntrianController extends Controller
             );
         }
     }
-}
 
+    public function ambil_antrian(Request $request)
+    {
+        $antrian_id = $request->antrian_id;
+        $user_id = $request->user_id;
+
+        try {
+            DB::beginTransaction();
+            $antrian = Antrian::where('user_id', $user_id)
+                ->whereDate('created_at', Carbon::today())
+                ->where(function ($query) {
+                    $query->where('status', 1)->orWhere('status', 2);
+                })
+                ->first();
+            if ($antrian) {
+                return $this->callresponse->response(
+                    'Anda sudah mengambil antrian hari ini',
+                    null,
+                    false
+                );
+            }
+
+            $antrian = Antrian::where('id', $antrian_id)->first();
+            if (!$antrian) {
+                return $this->callresponse->response(
+                    'Antrian tidak ditemukan',
+                    null,
+                    false
+                );
+            }
+
+            $antrian->user_id = $user_id;
+            $antrian->status = 1;
+            $antrian->save();
+            DB::commit();
+
+            $currentAntrian = Antrian::whereDate('created_at', Carbon::today())
+                ->whereNull('user_id')
+                ->get();
+
+            return $this->callresponse->response(
+                'Antrian berhasil diambil',
+                $currentAntrian,
+                true
+            );
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->callresponse->response(
+                $th->getMessage(),
+                null,
+                false
+            );
+        }
+    }
+
+    public function get_current_antrian($user_id)
+    {
+        $currentAntrian = Antrian::where('user_id', $user_id)
+            ->whereDate('created_at', Carbon::today())
+            ->whereIn('status', [1, 2])
+            ->first();
+
+        return $this->callresponse->response(
+            'Antrian berhasil diambil',
+            $currentAntrian,
+            true
+        );
+    }
+
+    public function get_history_antrian($user_id)
+    {
+        $historyAntrian = Antrian::where('user_id', $user_id)
+            ->where('status', 3)
+            ->get();
+
+        return $this->callresponse->response(
+            'Antrian berhasil diambil',
+            $historyAntrian,
+            true
+        );
+    }
+}

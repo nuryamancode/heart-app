@@ -21,6 +21,9 @@ Route::get('/detail-berita/{id}', [ArtikelController::class, 'berita_detail']);
 Route::get('/jadwal', [JadwalController::class, 'jadwal']);
 Route::get('/video-tutorial', [VideoController::class, 'video_tutorial']);
 Route::get('/antrian', [AntrianController::class, 'antrian']);
+Route::post('/ambil-antrian', [AntrianController::class, 'ambil_antrian']);
+Route::get('/get-antrian-sekarang/{user_id}', [AntrianController::class, 'get_current_antrian']);
+Route::get('/get-history-antrian/{user_id}', [AntrianController::class, 'get_history_antrian']);
 
 Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile']);
 Route::post('/update-password/{id}', [ProfileController::class, 'updatePasswordApi']);

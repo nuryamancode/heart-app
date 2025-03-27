@@ -10,9 +10,18 @@ use App\Events\SendSellerMessage;
 use App\Events\SendUserMessage;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
 {
+
+    protected $callresponse;
+
+    public function __construct(ResponseController $respone)
+    {
+        $this->callresponse = $respone;
+    }
+
     public function index()
     {
         return view('user.chat-admin');
@@ -47,27 +56,57 @@ class ChatController extends Controller
 
     public function sendMessageFromUserToAdmin(Request $request)
     {
+        // Validasi data yang diterima dari pengguna
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'message' => 'required|string',
+                'receiver_id' => 'required|exists:users,id',
+            ],
+            [
+                'message.required' => 'Pesan wajib diisi.',
+                'receiver_id.required' => 'ID admin wajib diisi.',
+                'receiver_id.exists' => 'ID admin tidak valid.',
+            ]
+        );
 
-        $request->validate([
-            'message' => 'required|string',
-            'receiver_id' => 'required|exists:users,id', // Sesuaikan dengan tabel admin
-        ]);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return $this->callresponse->response(
+                $errors[0],
+                null,
+                false,
+            );
+        }
 
+        // Ambil data pesan dan receiver_id
         $message = $request->input('message');
-        $receiverId = 1;
-        $senderId = Auth::id();
-
-
+        $receiverId = $request->input('receiver_id');  // ID admin yang ingin dituju (disesuaikan dengan kebutuhan)
+        // $senderId = $request->input('sender_id'); // Ambil ID pengirim dari autentikasi
+        $senderId = Auth::user()->id; // Ambil ID pengirim dari autentikasi
+        \Log::debug('Sender ID: ' . $senderId); 
+        // Simpan pesan ke database
         $chat = new Chat();
         $chat->sender_id = $senderId;
         $chat->receiver_id = $receiverId;
         $chat->message = $message;
-        $chat->seen = 0; // Belum terbaca
+        $chat->seen = false; // Pesan baru, belum terbaca
         $chat->save();
 
+        // Kirimkan event ke Pusher untuk pemberitahuan pesan (real-time)
         broadcast(new SendUserMessage($message, $senderId, $receiverId))->toOthers();
 
-        return response()->json(['success' => true, 'message' => 'Pesan terkirim']);
+        // Mengembalikan respons API dalam format JSON
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesan berhasil dikirim!',
+            'data' => [
+                'message' => $chat->message,
+                'sender_id' => $chat->sender_id,
+                'receiver_id' => $chat->receiver_id,
+                'created_at' => $chat->created_at->format('h:i A'),
+            ]
+        ]);
     }
 
 

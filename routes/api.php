@@ -28,6 +28,7 @@ Route::get('/get-history-antrian/{user_id}', [AntrianController::class, 'get_his
 Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile']);
 Route::post('/update-password/{id}', [ProfileController::class, 'updatePasswordApi']);
 
+Route::post('/send-message', [ChatController::class, 'sendMessageFromUserToAdmin'])->middleware('auth:sanctum');
 
 // Home Page & Berita & Detail Berita
 
@@ -69,6 +70,5 @@ Route::post('/profile', [ProfileController::class, 'store']);
 Route::group(['prefix' => 'user'], function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat-admin');
     Route::get('/fetch-message', [ChatController::class, 'fetchMessagesFromUserToAdmin'])->name('fetch.to-admin');
-    Route::post('/send-message', [ChatController::class, 'sendMessageFromUserToAdmin'])->name('send.to-admin');
 });
 // Chat

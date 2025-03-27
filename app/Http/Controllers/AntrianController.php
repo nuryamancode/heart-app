@@ -173,19 +173,24 @@ class AntrianController extends Controller
                     $query->where('status', 1)->orWhere('status', 2);
                 })
                 ->first();
+
+            $currentAntrian = Antrian::whereDate('created_at', Carbon::today())
+                ->whereNull('user_id')
+                ->get();
+
             if ($antrian) {
                 return $this->callresponse->response(
                     'Anda sudah mengambil antrian hari ini',
-                    null,
+                    $currentAntrian,
                     false
                 );
             }
 
-            $antrian = Antrian::where('id', $antrian_id)->first();
+            $antrian = Antrian::where('id', $antrian_id)->whereNull('user_id')->first();
             if (!$antrian) {
                 return $this->callresponse->response(
                     'Antrian tidak ditemukan',
-                    null,
+                    $currentAntrian,
                     false
                 );
             }
@@ -194,10 +199,6 @@ class AntrianController extends Controller
             $antrian->status = 1;
             $antrian->save();
             DB::commit();
-
-            $currentAntrian = Antrian::whereDate('created_at', Carbon::today())
-                ->whereNull('user_id')
-                ->get();
 
             return $this->callresponse->response(
                 'Antrian berhasil diambil',
@@ -231,7 +232,7 @@ class AntrianController extends Controller
     public function get_history_antrian($user_id)
     {
         $historyAntrian = Antrian::where('user_id', $user_id)
-            ->where('status', 3)
+            ->whereIn('status', [3, 4])
             ->get();
 
         return $this->callresponse->response(

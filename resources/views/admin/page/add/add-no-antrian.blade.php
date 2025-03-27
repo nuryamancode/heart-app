@@ -15,10 +15,10 @@
                 <form method="POST" action="{{ route('post-no-antrian') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
-                        <label for="noAntrian" class="form-label">No Antrian</label>
-                        <input type="number" class="form-control border-secondary" id="noAntrian" min="1"
-                            max="100" name="no_antrian" value="{{ old('no_antrian') }}">
-                        @error('no_antrian')
+                        <label for="jumlahAntrian" class="form-label">Jumlah Antrian</label>
+                        <input type="number" class="form-control border-secondary" id="jumlahAntrian" min="1"
+                            max="100" name="jumlah" value="{{ old('jumlah') }}">
+                        @error('jumlah')
                             <span class="text-danger">
                                 {{ $message }}
                             </span>

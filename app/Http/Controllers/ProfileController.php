@@ -212,7 +212,7 @@ class ProfileController extends Controller
 
         // Update the password
         $user->update([
-            'password' => Hash::make($request->new_password),
+            'password' => Hash::make($request->password),
         ]);
 
         return $this->callresponse->response(

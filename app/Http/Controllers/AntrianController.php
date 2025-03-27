@@ -45,32 +45,58 @@ class AntrianController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'no_antrian' => [
+    //             'required',
+    //             'integer',
+    //             'min:1',
+    //             'max:100',
+    //             'unique:antrians,no_antrian',
+    //         ],
+    //     ], [
+    //         'no_antrian.required' => 'Nomor antrian wajib diisi.',
+    //         'no_antrian.integer' => 'Nomor antrian harus berupa angka.',
+    //         'no_antrian.min' => 'Nomor antrian tidak boleh kurang dari 1.',
+    //         'no_antrian.max' => 'Nomor antrian tidak boleh lebih dari 100.',
+    //         'no_antrian.unique' => 'Nomor antrian ini sudah ada, silakan gunakan nomor lain.',
+    //     ]);
+
+
+    //     Antrian::create([
+    //         'no_antrian' => $request->no_antrian,
+    //     ]);
+
+    //     Alert::success('Success', 'Antrian berhasil ditambahkan');
+    //     return redirect()->route('no-antrian');
+    // }
+
     public function store(Request $request)
     {
         $request->validate([
-            'no_antrian' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:100',
-                'unique:antrians,no_antrian',
-            ],
+            'jumlah' => 'required|integer|min:1',
         ], [
-            'no_antrian.required' => 'Nomor antrian wajib diisi.',
-            'no_antrian.integer' => 'Nomor antrian harus berupa angka.',
-            'no_antrian.min' => 'Nomor antrian tidak boleh kurang dari 1.',
-            'no_antrian.max' => 'Nomor antrian tidak boleh lebih dari 100.',
-            'no_antrian.unique' => 'Nomor antrian ini sudah ada, silakan gunakan nomor lain.',
+            'jumlah.required' => 'Jumlah antrian harus diisi.',
+            'jumlah.integer' => 'Jumlah harus berupa angka.',
+            'jumlah.min' => 'Jumlah tidak boleh kurang dari 1.',
         ]);
 
+        $startingNoAntrian = $request->no_antrian;
+        $jumlah = $request->jumlah;
 
-        Antrian::create([
-            'no_antrian' => $request->no_antrian,
-        ]);
+        for ($i = 1; $i < $jumlah; $i++) {
+            $newNoAntrian = 'A' . str_pad($startingNoAntrian + $i, 3, '0', STR_PAD_LEFT);
 
-        Alert::success('Success', 'Antrian berhasil ditambahkan');
+            Antrian::create([
+                'no_antrian' => $newNoAntrian,
+            ]);
+        }
+
+        Alert::success('Success', "{$jumlah} antrian berhasil ditambahkan.");
         return redirect()->route('no-antrian');
     }
+
 
 
     /**

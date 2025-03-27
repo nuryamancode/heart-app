@@ -2,15 +2,17 @@
 
 @push('css')
     <style>
-        .antrian{
+        .antrian {
             background-color: #54c42e;
-            border-radius: 10px;
+            border-radius: 10px !important;
         }
-        .card-title{
+
+        .card-title {
             text-align: center !important;
             margin-bottom: 30px !important;
         }
-        .btn-secondary{
+
+        .btn-secondary {
             background-color: #fff !important;
             color: #000 !important;
             border: none !important;
@@ -18,6 +20,11 @@
             justify-content: center !important;
             align-items: center !important;
             border-radius: 10px !important;
+        }
+
+        .bg-secondary {
+            border-radius: 0 0 10px 10px !important;
+            background-color: #ccc !important;
         }
     </style>
 @endpush
@@ -27,101 +34,54 @@
         <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <div class="text-start">
-                            <a href="{{ route('add-no-antrian') }}" class="btn btn-primary">Tambah Data</a>
-                        </div>
-
-                        <div class="row d-flex justify-content-start align-items-center g-1">
-                            <div class="col-4">
-                                <div class="card antrian">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Antrian A001</h4>
-                                        <div class="btn btn-secondary disabled">
-                                            Status Antrian
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card antrian">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Antrian A001</h4>
-                                        <div class="btn btn-secondary disabled">
-                                            Status Antrian
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card antrian">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Antrian A001</h4>
-                                        <div class="btn btn-secondary disabled">
-                                            Status Antrian
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card antrian">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Antrian A001</h4>
-                                        <div class="btn btn-secondary disabled">
-                                            Status Antrian
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <table id="dataTableExample" class="table table-striped table-bordered border-secondary">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Nomor Antrian</th>
-                                    <th class="text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($antrian as $item)
-                                    <tr>
-                                        <td class="text-center">{{ $item->no_antrian }}</td>
-                                        <td class="text-center">
-                                            <a href="{{ route('edit-no-antrian', $item->id) }}"
-                                                class="btn btn-primary me-3"><i class="link-icon"
-                                                    data-feather="edit"></i></a>
-                                            <a data-bs-toggle="modal" data-bs-target="#hapusButton{{ $item->id }}"
-                                                class="btn btn-danger"><i class="link-icon" data-feather="trash-2"></i></a>
-                                        </td>
-                                    </tr>
-                                    <div class="modal fade" id="hapusButton{{ $item->id }}" tabindex="-1"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Hapus Data?</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    Apakah Kamu Yakin Ingin Menghapus?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">Tutup</button>
-                                                    <form action="{{ route('delete-no-antrian', $item->id) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-danger">Ya, Hapus</button>
-                                                    </form>
-                                                </div>
+                    <div class="text-start mb-3">
+                        <a href="{{ route('add-no-antrian') }}" class="btn btn-primary">Tambah Antrian</a>
+                    </div>
+                    @if (count($antrian) > 0)
+                        <div class="row d-flex justify-content-start align-items-center g-1 overflow-x-hidden-hidden">
+                            @foreach ($antrian as $item)
+                                <div class="col-4">
+                                    <div class="card antrian">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Antrian {{ $item->no_antrian }}</h4>
+                                            <div class="btn btn-secondary disabled">
+                                                Status Antrian
                                             </div>
                                         </div>
+                                        <div
+                                            class="card-footer d-flex justify-content-center align-items-center bg-secondary">
+                                            <a href="" class="btn btn-danger me-auto" title="Hapus">
+                                                <i class="link-icon" data-feather="trash"
+                                                    style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                            <a href="" class="btn btn-success me-auto" title="Selesai">
+                                                <i class="link-icon" data-feather="user-check"
+                                                    style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                            <a href="" class="btn btn-primary me-auto" title="Panggil">
+                                                <i class="link-icon" data-feather="phone"
+                                                    style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                            <a href="" class="btn btn-warning me-auto" title="Lewati">
+                                                <i class="link-icon" data-feather="skip-forward"
+                                                    style="width: 16px; height: 16px;"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="row d-flex justify-content-center align-items-center g-1">
+                            <div class="col-4">
+                                <div class="card antrian">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Belum Ada Antrian</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

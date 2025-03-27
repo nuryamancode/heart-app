@@ -98,7 +98,7 @@ class ChatController extends Controller
 
         // Mengembalikan respons API dalam format JSON
         return response()->json([
-            'success' => true,
+            'status' => true,
             'message' => 'Pesan berhasil dikirim!',
             'data' => [
                 'message' => $chat->message,

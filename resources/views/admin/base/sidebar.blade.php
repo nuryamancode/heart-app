@@ -26,21 +26,15 @@
             </li>
             <li class="nav-item nav-category">Fungsi</li>
             <li class="nav-item">
-                <a href="{{ route('monitoring-antrian') }}" class="nav-link">
-                    <i class="link-icon" data-feather="calendar"></i>
-                    <span class="link-title">Monitoring Antrian</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{{ route('test-manual') }}" class="nav-link">
-                    <i class="link-icon" data-feather="calendar"></i>
+                    <i class="link-icon" data-feather="sliders"></i>
                     <span class="link-title">Test Manual</span>
                 </a>
             </li>
             <li class="nav-item nav-category">Kelola</li>
             <li class="nav-item">
                 <a href="{{ route('artikel') }}" class="nav-link">
-                    <i class="link-icon" data-feather="calendar"></i>
+                    <i class="link-icon" data-feather="book"></i>
                     <span class="link-title">Artikel</span>
                 </a>
             </li>
@@ -52,14 +46,14 @@
             </li>
             <li class="nav-item">
                 <a href="{{ route('tutorial-video') }}" class="nav-link">
-                    <i class="link-icon" data-feather="calendar"></i>
+                    <i class="link-icon" data-feather="video"></i>
                     <span class="link-title">Tutorial Video</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="{{ route('no-antrian') }}" class="nav-link">
-                    <i class="link-icon" data-feather="calendar"></i>
-                    <span class="link-title">No Antrian</span>
+                    <i class="link-icon" data-feather="pocket"></i>
+                    <span class="link-title">Antrian</span>
                 </a>
             </li>
 

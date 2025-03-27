@@ -19,13 +19,37 @@ class AntrianController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = [
-            'antrian' => Antrian::all()
-        ];
-        return view('admin.page.no-antrian', $data);
+        // Get the selected date and status from the request
+        $dateFilter = $request->input('date');
+        $statusFilter = $request->input('status');
+
+        // Prepare the query builder
+        $query = Antrian::query();
+
+        // Filter by date if selected
+        if ($dateFilter) {
+            $selectedDate = Carbon::parse($dateFilter);
+            $query->whereDate('created_at', $selectedDate->toDateString());
+        } else {
+            // Default to today's date if no date is selected
+            $query->whereDate('created_at', Carbon::today()->toDateString());
+        }
+
+        // Filter by status if selected
+        if ($statusFilter !== null) {
+            $query->where('status', $statusFilter);
+        }
+
+        // Apply ordering by status (with status 1 at the top)
+        $antrian = $query->orderByRaw('status = 1 DESC')->get();
+
+        // Pass the data to the view
+        return view('admin.page.no-antrian', ['antrian' => $antrian]);
     }
+
+
     public function monitoring()
     {
         $data = [
@@ -45,33 +69,6 @@ class AntrianController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'no_antrian' => [
-    //             'required',
-    //             'integer',
-    //             'min:1',
-    //             'max:100',
-    //             'unique:antrians,no_antrian',
-    //         ],
-    //     ], [
-    //         'no_antrian.required' => 'Nomor antrian wajib diisi.',
-    //         'no_antrian.integer' => 'Nomor antrian harus berupa angka.',
-    //         'no_antrian.min' => 'Nomor antrian tidak boleh kurang dari 1.',
-    //         'no_antrian.max' => 'Nomor antrian tidak boleh lebih dari 100.',
-    //         'no_antrian.unique' => 'Nomor antrian ini sudah ada, silakan gunakan nomor lain.',
-    //     ]);
-
-
-    //     Antrian::create([
-    //         'no_antrian' => $request->no_antrian,
-    //     ]);
-
-    //     Alert::success('Success', 'Antrian berhasil ditambahkan');
-    //     return redirect()->route('no-antrian');
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -82,10 +79,18 @@ class AntrianController extends Controller
             'jumlah.min' => 'Jumlah tidak boleh kurang dari 1.',
         ]);
 
-        $startingNoAntrian = $request->no_antrian;
+        $today = Carbon::today()->toDateString();
+        $existingAntrianToday = Antrian::whereDate('created_at', $today)->exists();
+
+        if ($existingAntrianToday) {
+            Alert::error('Error', 'Tidak bisa menambahkan antrian, karena sudah ada antrian hari ini.');
+            return redirect()->route('no-antrian');
+        }
+
+        $startingNoAntrian = max(1, $request->no_antrian);
         $jumlah = $request->jumlah;
 
-        for ($i = 1; $i < $jumlah; $i++) {
+        for ($i = 0; $i < $jumlah; $i++) {
             $newNoAntrian = 'A' . str_pad($startingNoAntrian + $i, 3, '0', STR_PAD_LEFT);
 
             Antrian::create([
@@ -98,6 +103,14 @@ class AntrianController extends Controller
     }
 
 
+    public function deleteAllToday(Request $request)
+    {
+        $dateFilter = $request->input('date');
+        $selectedDate = $dateFilter ? Carbon::parse($dateFilter) : Carbon::today();
+        Antrian::whereDate('created_at', $selectedDate)->delete();
+        Alert::success('Success', 'Semua antrian untuk tanggal ' . $selectedDate->toDateString() . ' telah dihapus.');
+        return redirect()->route('no-antrian');
+    }
 
     /**
      * Display the specified resource.

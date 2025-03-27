@@ -17,7 +17,7 @@
                     <div class="mb-3">
                         <label for="jumlahAntrian" class="form-label">Jumlah Antrian</label>
                         <input type="number" class="form-control border-secondary" id="jumlahAntrian" min="1"
-                            max="100" name="jumlah" value="{{ old('jumlah') }}">
+                            max="500" name="jumlah" value="{{ old('jumlah') }}">
                         @error('jumlah')
                             <span class="text-danger">
                                 {{ $message }}

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Antrian;
 use App\Models\Artikel;
 use App\Models\Jadwal;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -14,8 +16,7 @@ class DashboardController extends Controller
         $data = [
             'artikelCount' => Artikel::count(),
             'jadwalCount' => Jadwal::count(),
-            'noAntrianCount' => Antrian::count(),
-            'antrian'=> Antrian::where('status', 1)->paginate(5)
+            'noAntrianCount' => User::whereNot('id', Auth::user()->id)->count(),
         ];
         return view('admin.page.dashboard', $data);
     }

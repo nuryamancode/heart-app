@@ -88,7 +88,7 @@
                                 src="{{ asset('assets/image-new/programmer.svg') }}" alt="">
                         </div>
                         <div class="text-center">
-                            <p class="fs-16px fw-bolder">Amiah Burton</p>
+                            <p class="fs-16px fw-bolder">{{ Auth::user()->name }}</p>
                         </div>
                     </div>
                     <ul class="list-unstyled p-1">

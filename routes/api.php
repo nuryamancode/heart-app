@@ -29,6 +29,7 @@ Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile'])
 Route::post('/update-password/{id}', [ProfileController::class, 'updatePasswordApi']);
 
 Route::post('/send-message', [ChatController::class, 'sendMessageFromUserToAdmin'])->middleware('auth:sanctum');
+Route::get('/fetch-message', [ChatController::class, 'fetchMessagesFromUserToAdmin'])->middleware('auth:sanctum');
 
 // Home Page & Berita & Detail Berita
 
@@ -69,6 +70,5 @@ Route::post('/profile', [ProfileController::class, 'store']);
 // Chat
 Route::group(['prefix' => 'user'], function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat-admin');
-    Route::get('/fetch-message', [ChatController::class, 'fetchMessagesFromUserToAdmin'])->name('fetch.to-admin');
 });
 // Chat

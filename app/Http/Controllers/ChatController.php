@@ -35,24 +35,71 @@ class ChatController extends Controller
         ])->where('role', 'user')->get();
         return view('admin.page.chat', compact('users'));
     }
+    // public function fetchMessagesFromUserToAdmin(Request $request)
+    // {
+    //     $request->validate([
+    //         'receiver_id' => 'required|exists:users,id',
+    //     ]);
+    //     $receiverId = $request->input('receiver_id');
+    //     $sellerId = Auth::user()->id;
+
+    //     $messages = Chat::where(function ($query) use ($sellerId, $receiverId) {
+    //         $query->where('sender_id', $sellerId)
+    //             ->where('receiver_id', $receiverId);
+    //     })->orWhere(function ($query) use ($sellerId, $receiverId) {
+    //         $query->where('sender_id', $receiverId)
+    //             ->where('receiver_id', $sellerId);
+    //     })->orderBy('created_at', 'asc')->get();
+
+    //     return response()->json(['messages' => $messages]);
+    // }
+
     public function fetchMessagesFromUserToAdmin(Request $request)
     {
-        $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-        ]);
-        $receiverId = $request->input('receiver_id');
-        $sellerId = Auth::user()->id;
+        // Validate the request, ensure receiver_id is passed
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'receiver_id' => 'required|exists:users,id',
+            ],
+            [
+                'receiver_id.required' => 'ID admin wajib diisi.',
+                'receiver_id.exists' => 'ID admin tidak valid.',
+            ]
+        );
 
-        $messages = Chat::where(function ($query) use ($sellerId, $receiverId) {
-            $query->where('sender_id', $sellerId)
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return $this->callresponse->response(
+                $errors[0],
+                null,
+                false,
+            );
+        }
+
+        $receiverId = $request->input('receiver_id');  // ID admin to fetch messages for
+        $senderId = Auth::user()->id; // Get sender ID from authentication
+
+        // Fetch the chat messages between the user and the admin
+        $messages = Chat::where(function ($query) use ($senderId, $receiverId) {
+            $query->where('sender_id', $senderId)
                 ->where('receiver_id', $receiverId);
-        })->orWhere(function ($query) use ($sellerId, $receiverId) {
-            $query->where('sender_id', $receiverId)
-                ->where('receiver_id', $sellerId);
-        })->orderBy('created_at', 'asc')->get();
+        })
+            ->orWhere(function ($query) use ($senderId, $receiverId) {
+                $query->where('sender_id', $receiverId)
+                    ->where('receiver_id', $senderId);
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-        return response()->json(['messages' => $messages]);
+        // Return the chat messages as a response
+        return response()->json([
+            'status' => true,
+            'message' => 'Pesan berhasil diambil!',
+            'data' => $messages,
+        ]);
     }
+
 
     public function sendMessageFromUserToAdmin(Request $request)
     {
@@ -84,7 +131,7 @@ class ChatController extends Controller
         $receiverId = $request->input('receiver_id');  // ID admin yang ingin dituju (disesuaikan dengan kebutuhan)
         // $senderId = $request->input('sender_id'); // Ambil ID pengirim dari autentikasi
         $senderId = Auth::user()->id; // Ambil ID pengirim dari autentikasi
-        \Log::debug('Sender ID: ' . $senderId); 
+        \Log::debug('Sender ID: ' . $senderId);
         // Simpan pesan ke database
         $chat = new Chat();
         $chat->sender_id = $senderId;

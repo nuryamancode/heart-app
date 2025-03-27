@@ -1,14 +1,80 @@
 @extends('admin.base.layout', ['title' => 'Kelola No Antrian'])
 
+@push('css')
+    <style>
+        .antrian{
+            background-color: #54c42e;
+            border-radius: 10px;
+        }
+        .card-title{
+            text-align: center !important;
+            margin-bottom: 30px !important;
+        }
+        .btn-secondary{
+            background-color: #fff !important;
+            color: #000 !important;
+            border: none !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            border-radius: 10px !important;
+        }
+    </style>
+@endpush
+
 @section('page-content')
     <div class="row chat-wrapper">
         <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <div class="text-end">
-                            <a href="{{ route('add-no-antrian') }}" class="btn btn-secondary">Tambah Data</a>
+                        <div class="text-start">
+                            <a href="{{ route('add-no-antrian') }}" class="btn btn-primary">Tambah Data</a>
                         </div>
+
+                        <div class="row d-flex justify-content-start align-items-center g-1">
+                            <div class="col-4">
+                                <div class="card antrian">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Antrian A001</h4>
+                                        <div class="btn btn-secondary disabled">
+                                            Status Antrian
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card antrian">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Antrian A001</h4>
+                                        <div class="btn btn-secondary disabled">
+                                            Status Antrian
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card antrian">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Antrian A001</h4>
+                                        <div class="btn btn-secondary disabled">
+                                            Status Antrian
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card antrian">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Antrian A001</h4>
+                                        <div class="btn btn-secondary disabled">
+                                            Status Antrian
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <table id="dataTableExample" class="table table-striped table-bordered border-secondary">
                             <thead>
                                 <tr>
@@ -43,10 +109,11 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Tutup</button>
-                                                        <form action="{{ route('delete-no-antrian', $item->id) }}" method="POST">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-danger">Ya, Hapus</button>
-                                                        </form>
+                                                    <form action="{{ route('delete-no-antrian', $item->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

@@ -13,9 +13,15 @@ class TestController extends Controller
     /**
      * Display a listing of the resource.
      */
+    protected $callresponse;
+    public function __construct(ResponseController $respone)
+    {
+        $this->callresponse = $respone;
+    }
+
     public function index()
     {
-        $data =[
+        $data = [
             'video' => Video::first()
         ];
         return view('user.test-page', $data);
@@ -210,7 +216,70 @@ class TestController extends Controller
 
 
     // Test Manual Admin
-    public function testManual(){
+    public function testManual()
+    {
         return view('admin.page.test-manual');
+    }
+
+    public function result_test(Request $request)
+    {
+        $user_id = $request->user_id;
+        $ageAsli = $request->age;
+        $gender = $request->gender == 'wanita' ? 0 : 1;
+        $soal_2 = $request->soal[2] == 'Ya' ? 1 : 0;
+        $soal_3 = $request->soal[3] == 'Ya' ? 1 : 0;
+        $soal_4 = $request->soal[4] == 'Ya' ? 1 : 0;
+        $soal_5 = $request->soal[5] == 'Ya' ? 2 : 0;
+        $soal_6 = $request->soal[6] == 'Ya' ? 1 : 0;
+        $soal_7 = $request->soal[7] == 'Ya' ? 1 : 0;
+        $soal_8 = $request->soal[8] == 'Ya' ? 1 : 0;
+        $soal_9 = $request->soal[9] == 'Ya' ? 1 : 0;
+        $soal_10 = $request->soal[10] == 'Ya' ? 5 : 0;
+        $soal_11 = $request->soal[11] == 'Ya' ? 2 : 0;
+        $soal_12 = $request->soal[12] == 'Ya' ? 2 : 0;
+        $soal_13 = $request->soal[13] == 'Ya' ? 2 : 0;
+
+        $age = (int) $request->age > 45 ? 2 : 1;
+        $gender = $request->gender == 'wanita' ? 0 : 1;
+        $count_soal = $soal_2 + $soal_3 + $soal_4 + $soal_5 + $soal_6 + $soal_7 + $soal_8 + $soal_9 + $soal_10 + $soal_11 + $soal_12 + $soal_13;
+
+        $score = $age + $gender + $count_soal;
+
+        $test = Test::create([
+            'user_id' => $user_id,
+            'age' => $ageAsli,
+            'gender' => $gender,
+            'soal_2' => $soal_2,
+            'soal_3' => $soal_3,
+            'soal_4' => $soal_4,
+            'soal_5' => $soal_5,
+            'soal_6' => $soal_6,
+            'soal_7' => $soal_7,
+            'soal_8' => $soal_8,
+            'soal_9' => $soal_9,
+            'soal_10' => $soal_10,
+            'soal_11' => $soal_11,
+            'soal_12' => $soal_12,
+            'soal_13' => $soal_13,
+            'status' => 'sudah',
+            'score' => (int) ceil($score / 2)
+        ]);
+
+        return $this->callresponse->response(
+            'Test selesai',
+            $test,
+            true
+        );
+    }
+
+    public function history_test($user_id)
+    {
+        $test = Test::where('user_id', $user_id)->orderBy('created_at', 'desc')->get();
+
+        return $this->callresponse->response(
+            'Test selesai',
+            $test,
+            true
+        );
     }
 }

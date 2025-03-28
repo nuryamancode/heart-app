@@ -233,6 +233,7 @@ class AntrianController extends Controller
     {
         $historyAntrian = Antrian::where('user_id', $user_id)
             ->whereIn('status', [3, 4])
+            ->orderBy('updated_at', 'desc')
             ->get();
 
         return $this->callresponse->response(

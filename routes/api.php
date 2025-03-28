@@ -28,9 +28,11 @@ Route::get('/get-history-antrian/{user_id}', [AntrianController::class, 'get_his
 Route::post('/update-profile/{id}', [ProfileController::class, 'updateProfile']);
 Route::post('/update-password/{id}', [ProfileController::class, 'updatePasswordApi']);
 
+Route::post('/result-test', [TestController::class, 'result_test']);
+Route::get('/history-test/{user_id}', [TestController::class, 'history_test']);
+
 Route::post('/send-message', [ChatController::class, 'sendMessageFromUserToAdmin'])->middleware('auth:sanctum');
 Route::get('/fetch-message', [ChatController::class, 'fetchMessagesFromUserToAdmin'])->middleware('auth:sanctum');
-
 // Home Page & Berita & Detail Berita
 
 

@@ -10,8 +10,8 @@
     <meta name="keywords"
         content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
 
-        <link rel="icon" href="{{ asset('assets/image-new/logo-heart.png') }}">
-        <title>{{ $title }}</title>
+    <link rel="icon" href="{{ asset('assets/image-new/logo-heart.png') }}">
+    <title>{{ $title }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/vendors/datatables.net-bs5/dataTables.bootstrap5.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/fonts/feather-font/css/iconfont.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
+    @stack('css')
 
 </head>
 

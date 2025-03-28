@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/post-no-antrian', [AntrianController::class, 'store'])->name('post-no-antrian');
         Route::post('/update-no-antrian/{id}', [AntrianController::class, 'update'])->name('update-no-antrian');
         Route::post('/delete-no-antrian/{id}', [AntrianController::class, 'destroy'])->name('delete-no-antrian');
+        Route::post('/delete-no-antrian-all', [AntrianController::class, 'deleteAllToday'])->name('delete-no-antrian-all');
 
     });
 

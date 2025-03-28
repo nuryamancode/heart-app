@@ -116,7 +116,6 @@ class ProfileController extends Controller
 
     public function updateProfile(Request $request, $id)
     {
-        \Log::info($id);
         $user = User::find($id);
         // dd($user);
         if (!$user) {
@@ -126,7 +125,6 @@ class ProfileController extends Controller
                 false,
             );
         }
-        \Log::info($request->all());
 
         $validator = Validator::make($request->all(), [
             'email' => 'email',
@@ -214,7 +212,7 @@ class ProfileController extends Controller
 
         // Update the password
         $user->update([
-            'password' => Hash::make($request->new_password),
+            'password' => Hash::make($request->password),
         ]);
 
         return $this->callresponse->response(

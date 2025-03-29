@@ -257,7 +257,7 @@
             }
 
             // Polling every 3 seconds (3000 milliseconds)
-            setInterval(fetchMessages, 3000);
+            setInterval(fetchMessages, 1000);
 
             fetchMessages(); // Initial fetch when page loads
         });

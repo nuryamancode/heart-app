@@ -119,7 +119,7 @@ class ChatController extends Controller
         $chat->seen = false; // Pesan baru, belum terbaca
         $chat->save();
 
-        event(new ChatSen($chat, $receiverId, auth()->id()));
+        // event(new ChatSen($chat, $receiverId, auth()->id()));
 
         // Mengembalikan respons API dalam format JSON
         return response()->json([
@@ -195,7 +195,7 @@ class ChatController extends Controller
 
         $message->formatted_time = $message->created_at->format('h:i A');
 
-        event(new ChatSen($message, $receiver_id ,auth()->id()));
+        // event(new ChatSen($message, $receiver_id ,auth()->id()));
 
         return response()->json([
             'success' => true,

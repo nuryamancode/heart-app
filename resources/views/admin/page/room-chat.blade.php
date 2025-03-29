@@ -179,7 +179,6 @@
             const receiverId = document.getElementById('receiver_id').value;
             const chatBox = document.getElementById('chat-box');
 
-            // Fungsi untuk memformat waktu
             function formatTime(dateString) {
                 if (!dateString) return 'Invalid Time';
                 const date = new Date(dateString);
@@ -193,17 +192,6 @@
                 return `${hours}:${minutes} ${ampm}`;
             }
 
-            // Menambahkan scroll otomatis ke bawah setelah halaman dimuat atau pesan diterima
-            function scrollToBottom() {
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-
-            // Memanggil scroll otomatis saat halaman dimuat pertama kali
-            window.onload = function() {
-                scrollToBottom();
-            };
-
-            // Form submission (mengirim pesan)
             chatForm.addEventListener('submit', function(event) {
                 event.preventDefault();
                 const message = messageInput.value.trim();
@@ -228,8 +216,15 @@
                             return;
                         }
 
-                        messageInput.value = ''; 
-                        scrollToBottom();
+                        // Setelah pesan berhasil dikirim, tambahkan ke chat box
+                        appendMessage({
+                            message: data.message,
+                            created_at: new Date().toISOString(),
+                            sender_id: {{ auth()->id() }}
+                        }, 'me');
+
+                        messageInput.value = ''; // Bersihkan input setelah kirim
+                        chatBox.scrollTop = chatBox.scrollHeight; // Scroll ke bawah otomatis
                     })
                     .catch(error => console.error('Error sending message:', error));
             });
@@ -248,21 +243,23 @@
                 chatBox.appendChild(newMessageElement);
             }
 
-            window.Echo.channel('chat.' + receiverId)
-                .listen('.chat-event', (event) => {
-                    console.log('Received real-time event:', event);
-                    appendMessage({
-                        message: event.message,
-                        created_at: event.created_at,
-                        sender_id: event.sender_id
-                    }, event.sender_id == {{ auth()->id() }} ? 'me' : 'user');
+            function fetchMessages() {
+                fetch(`/admin/fetch-admin?receiver_id=${receiverId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        chatBox.innerHTML = '';
+                        data.messages.forEach(msg => {
+                            appendMessage(msg, msg.sender_id == receiverId ? 'user' : 'me');
+                        });
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    })
+                    .catch(error => console.error('Error fetching messages:', error));
+            }
 
-                    scrollToBottom();
-                })
-                .error((error) => {
-                    console.log('Error:', error);
-                });
+            // Polling every 3 seconds (3000 milliseconds)
+            setInterval(fetchMessages, 3000);
 
+            fetchMessages(); // Initial fetch when page loads
         });
     </script>
 @endsection

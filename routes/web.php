@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\ChatSen;
 use App\Http\Controllers\AntrianController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\AuthController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\VideoController;
 use App\Models\Antrian;
 use Illuminate\Support\Facades\Route;
 
+Broadcast::routes();
 
 Route::get("/home", function () {
     if (Auth::check()) {
@@ -51,6 +53,7 @@ Route::middleware('auth')->group(function () {
 
     Route::group(['prefix' => 'admin/'], function () {
         Route::get('/chat', [ChatController::class, 'indexAdmin'])->name('chat');
+        Route::get('/chat-room/{id}', [ChatController::class, 'ChatRoom'])->name('chat-room');
         Route::get('/fetch-admin', [ChatController::class, 'fetchMessages'])->name('fetch.to-user');
         Route::post('/mark-seen/{receiverId}', [ChatController::class, 'markMessagesAsSeen'])->name('mark.seen');
         Route::post('/send-message', [ChatController::class, 'sendMessage'])->name('send.to-user');

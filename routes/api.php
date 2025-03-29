@@ -13,7 +13,7 @@ use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
+Broadcast::routes();
 Route::post('/signin', [AuthController::class, 'login_api']);
 Route::post('/signup', [AuthController::class, 'register_api']);
 Route::get('/berita', [ArtikelController::class, 'berita']);

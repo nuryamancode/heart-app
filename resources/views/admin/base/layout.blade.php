@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="Responsive HTML Admin Dashboard Template based on Bootstrap 5">
     <meta name="author" content="NobleUI">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="keywords"
         content="nobleui, bootstrap, bootstrap 5, bootstrap5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
 
@@ -20,6 +21,8 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/fonts/feather-font/css/iconfont.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/style.css') }}">
     @stack('css')
+
+    @vite('resources/js/app.js')
 
 </head>
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatSen;
+use App\Events\SendMessage;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -26,33 +28,9 @@ class ChatController extends Controller
     {
         return view('user.chat-admin');
     }
-    public function indexAdmin()
-    {
-        $users = User::with([
-            'send' => function ($query) {
-                $query->latest()->first(); // Ambil pesan terakhir dari user
-            }
-        ])->where('role', 'user')->get();
-        return view('admin.page.chat', compact('users'));
-    }
-    // public function fetchMessagesFromUserToAdmin(Request $request)
-    // {
-    //     $request->validate([
-    //         'receiver_id' => 'required|exists:users,id',
-    //     ]);
-    //     $receiverId = $request->input('receiver_id');
-    //     $sellerId = Auth::user()->id;
 
-    //     $messages = Chat::where(function ($query) use ($sellerId, $receiverId) {
-    //         $query->where('sender_id', $sellerId)
-    //             ->where('receiver_id', $receiverId);
-    //     })->orWhere(function ($query) use ($sellerId, $receiverId) {
-    //         $query->where('sender_id', $receiverId)
-    //             ->where('receiver_id', $sellerId);
-    //     })->orderBy('created_at', 'asc')->get();
 
-    //     return response()->json(['messages' => $messages]);
-    // }
+
 
     public function fetchMessagesFromUserToAdmin(Request $request)
     {
@@ -141,8 +119,7 @@ class ChatController extends Controller
         $chat->seen = false; // Pesan baru, belum terbaca
         $chat->save();
 
-        // Kirimkan event ke Pusher untuk pemberitahuan pesan (real-time)
-        broadcast(new SendUserMessage($message, $senderId, $receiverId))->toOthers();
+        event(new ChatSen($chat, $receiverId, auth()->id()));
 
         // Mengembalikan respons API dalam format JSON
         return response()->json([
@@ -162,49 +139,95 @@ class ChatController extends Controller
 
 
 
+    public function indexAdmin()
+    {
+        // Mengambil pengguna yang telah mengirim setidaknya satu pesan
+        $users = User::with([
+            'send' => function ($query) {
+                $query->latest()->first(); // Mengambil pesan terakhir dari pengguna
+            }
+        ])
+            ->whereHas('send') // Pastikan bahwa pengguna telah mengirim pesan
+            ->whereNot('id', Auth::user()->id) // Mengecualikan pengguna admin yang sedang login
+            ->get();
 
+        return view('admin.page.chat', compact('users'));
+    }
+    public function chatRoom($id)
+    {
+        // Mengambil pengguna yang telah mengirim setidaknya satu pesan
+        $users = User::with([
+            'send' => function ($query) {
+                // Ambil pesan terakhir yang dikirim oleh pengguna
+                $query->latest()->get();
+            }
+        ])
+            ->whereHas('send') // Pastikan pengguna memiliki pesan terkirim
+            ->whereNot('id', Auth::user()->id) // Mengecualikan admin yang sedang login
+            ->get();
+
+        $chat = Chat::where('sender_id', $id)->orWhere('receiver_id', $id)->get();
+        $data = [
+            'users' => $users,
+            'chat' => $chat
+        ];
+        // Menampilkan halaman dengan data pengguna yang memiliki pesan
+        return view('admin.page.room-chat', $data);
+    }
     public function sendMessage(Request $request)
     {
-        // Validasi data yang diterima
         $request->validate([
             'message' => 'required|string',
-            'receiver_id' => 'required|exists:users,id', // Pastikan penerima ada dalam database
+            'receiver_id' => 'required|exists:users,id',
         ]);
 
-        // Ambil ID pengirim dan penerima
         $sender_id = Auth::id();
         $receiver_id = $request->input('receiver_id');
         $message_content = $request->input('message');
 
-        // Simpan pesan ke dalam database
         $message = Chat::create([
             'sender_id' => $sender_id,
             'receiver_id' => $receiver_id,
             'message' => $message_content,
-            'seen' => false, // Pesan baru belum terbaca
+            'seen' => false,
+            'created_at' => now(), // Pastikan waktu tersimpan dengan benar
         ]);
 
-        // Kirimkan event ke Pusher untuk notifikasi pesan
-        broadcast(new SendAdminMessage($message, $sender_id, $receiver_id))->toOthers();
+        $message->formatted_time = $message->created_at->format('h:i A');
+
+        event(new ChatSen($message, $receiver_id ,auth()->id()));
 
         return response()->json([
             'success' => true,
             'message' => $message->message,
-            'created_at' => $message->created_at->format('h:i A'),
+            'created_at' => $message->created_at->toISOString(), // Kirim dalam format ISO 8601
+            'formatted_time' => $message->formatted_time,
         ]);
     }
+
+
+
     public function fetchMessages(Request $request)
     {
         $receiverId = $request->input('receiver_id');
-        $messages = Chat::where('sender_id', $receiverId)
-            ->orWhere('receiver_id', $receiverId)
+        $messages = Chat::where(function ($query) use ($receiverId) {
+            $query->where('sender_id', Auth::id())->where('receiver_id', $receiverId)
+                ->orWhere('sender_id', $receiverId)->where('receiver_id', Auth::id());
+        })
             ->orderBy('created_at', 'ASC') // Urutkan dari yang terlama ke terbaru
             ->get();
+
+        // Format waktu agar sama dengan yang ada di Blade
+        foreach ($messages as $message) {
+            $message->formatted_time = $message->created_at->format('h:i A');
+        }
 
         return response()->json([
             'messages' => $messages
         ]);
     }
+
+
 
     public function markMessagesAsSeen($receiverId)
     {

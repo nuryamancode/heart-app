@@ -26,14 +26,4 @@
   const chatContent = document.querySelector('.chat-content');
   const backToChatListButton = document.querySelector('#backToChatList');
 
-  // chatListItem.forEach((item) => {
-  //   item.addEventListener('click', () => {
-  //     chatContent.classList.toggle('show');
-  //   });
-  // });
-
-  // backToChatListButton.addEventListener('click', () => {
-  //   chatContent.classList.toggle('show');
-  // });
-
 })();
